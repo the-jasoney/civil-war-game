@@ -1,4 +1,9 @@
+div#app {
+    font-family: 'Inter', Arial;
+}
+
 button {
+    border-radius: 5px;
     background-color: #4CAF50;
     color: white;
     padding: 14px 20px;

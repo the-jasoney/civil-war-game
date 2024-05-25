@@ -9,9 +9,10 @@ function App()
     const phaserRef = useRef<IRefPhaserGame | null>(null);
 
     // Event emitted from the PhaserGame component
-    const currentScene = (scene: Phaser.Scene) => {}
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const currentScene = (_scene: Phaser.Scene) => {}
 
-    const [nextWaveDisabled, setNextWaveDisabled] = useState(false);
+    const [nextWaveDisabled, setNextWaveDisabled] = useState(true);
 
     const [wave, setWave] = useState(1);
 
@@ -20,6 +21,10 @@ function App()
         setNextWaveDisabled(true);
         setWave(wave + 1);
     }
+
+    EventBus.on('main-scene-ready', () => {
+        setNextWaveDisabled(false)
+    })
 
     EventBus.on('wave-complete', () => {
         setNextWaveDisabled(false)

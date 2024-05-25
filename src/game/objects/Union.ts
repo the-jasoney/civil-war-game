@@ -1,13 +1,9 @@
-export class Confederate extends Phaser.GameObjects.PathFollower {
-    public path: Phaser.Curves.Path;
-    public collisionFlag: boolean = false
-    public dead: boolean = false;
-
+export class Union extends Phaser.GameObjects.PathFollower {
+    path: Phaser.Curves.Path;
     private onCompleteCallback: () => void = () => {console.log('oncomplete')};
 
-    constructor(scene: Phaser.Scene, path: Phaser.Curves.Path, x: number, y: number, speed: number, strength: number,onCompleteCallback: () => void) {
-        super(scene, path, x, y, 'confederate');
-        console.log('confederate created')
+    constructor(scene: Phaser.Scene, path: Phaser.Curves.Path, x: number, y: number, speed: number, strength: number, onCompleteCallback: () => void) {
+        super(scene, path, x, y, 'union');
         this.scale = 0.2
         this.path = path;
         this.onCompleteCallback = onCompleteCallback;
@@ -26,4 +22,5 @@ export class Confederate extends Phaser.GameObjects.PathFollower {
     onComplete() {
         this.onCompleteCallback();
     }
+
 }
