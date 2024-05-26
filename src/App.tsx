@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Active, IRefPhaserGame, PhaserGame } from './game/PhaserGame';
 import { EventBus } from './game/EventBus';
 import './App.css';
+import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 
 function App()
 {
@@ -16,7 +17,9 @@ function App()
 
     const [wave, setWave] = useState(1);
 
-    const [currentActive, setCurrentActive] = useState(Active.Question);
+    const [currentActive, setCurrentActive] = useState(Active.Game);
+
+
 
     const nextWave = () => {
         EventBus.emit('next-wave')
@@ -41,7 +44,6 @@ function App()
             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} currentActive={currentActive} />
             <div id="menu">
                 <button className="menu-button" onClick={nextWave} disabled={nextWaveDisabled}>Next Wave</button>
-
                 <button className="menu-button" onClick={() => setCurrentActive(Active.Question)}>Quiz</button>
                 <button className="menu-button" onClick={() => setCurrentActive(Active.Game)}>Game</button>
                 <p>Wave: {wave}</p>

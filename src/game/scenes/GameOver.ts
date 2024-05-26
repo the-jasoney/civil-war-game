@@ -26,7 +26,6 @@ export class GameOver extends Scene
             align: 'center'
         }).setOrigin(0.5).setDepth(100);
 
-        this.add.text(512, 384 + 64, 'Click to return to the main menu')
 
         EventBus.emit('current-scene-ready', this);
     }
