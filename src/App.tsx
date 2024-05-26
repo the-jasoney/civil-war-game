@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { IRefPhaserGame, PhaserGame } from './game/PhaserGame';
+import { Active, IRefPhaserGame, PhaserGame } from './game/PhaserGame';
 import { EventBus } from './game/EventBus';
 import './App.css';
 
@@ -10,16 +10,17 @@ function App()
 
     // Event emitted from the PhaserGame component
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const currentScene = (_scene: Phaser.Scene) => {}
+    const currentScene = (scene: Phaser.Scene) => {}
 
     const [nextWaveDisabled, setNextWaveDisabled] = useState(true);
 
     const [wave, setWave] = useState(1);
 
+    const [currentActive, setCurrentActive] = useState(Active.Question);
+
     const nextWave = () => {
         EventBus.emit('next-wave')
         setNextWaveDisabled(true);
-        setWave(wave + 1);
     }
 
     EventBus.on('main-scene-ready', () => {
@@ -28,13 +29,22 @@ function App()
 
     EventBus.on('wave-complete', () => {
         setNextWaveDisabled(false)
+        setWave(wave + 1);
+    })
+
+    EventBus.on('question', () => {
+        document.getElementById('')
     })
 
     return (
         <div id="app">
-            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
+            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} currentActive={currentActive} />
             <div id="menu">
-                <button onClick={nextWave} disabled={nextWaveDisabled}>Next Wave</button>
+                <button className="menu-button" onClick={nextWave} disabled={nextWaveDisabled}>Next Wave</button>
+
+                <button className="menu-button" onClick={() => setCurrentActive(Active.Question)}>Quiz</button>
+                <button className="menu-button" onClick={() => setCurrentActive(Active.Game)}>Game</button>
+                <p>Wave: {wave}</p>
             </div>
         </div>
     )

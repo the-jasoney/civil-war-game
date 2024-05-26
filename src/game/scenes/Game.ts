@@ -41,6 +41,10 @@ export class Game extends Scene
     // Number of defenders left on the map
     defendersLeft: number = 0;
 
+    health: number = 100;
+
+    healthBar: Phaser.GameObjects.Rectangle;
+
     constructor ()
     {
         super('Game');
@@ -89,13 +93,30 @@ export class Game extends Scene
             console.log(`Enemy reached Washington`, this.enemies);
             this.enemiesLeft--;
             this.enemies.remove(i, true, true);
-            this.cameras.main.shake(100, 0.01);
+            this.cameras.main.shake(100, 0.005);
+            this.health -= 2 * this.wave;
+            EventBus.emit('health-change', this.health);
             if (this.enemiesLeft == 0) {
                 console.log('Wave complete');
                 EventBus.emit('wave-complete');
             }
         }
     }
+
+    createHealthBar (x: number, y: number, width: number, height: number, health: number, maxHealth: number) {
+        this.add.rectangle(x, y, width, height, 0x000000).strokeColor = 0xffffff;
+        this.healthBar = this.add.rectangle(x, y, width * (health / maxHealth) - 2, height - 2, 0xff0000);
+
+        EventBus.on('health-change', (health: number) => {
+            if (health <= 0) {
+                this.scene.start('GameOver');
+            }
+            this.health = health;
+            this.healthBar.width = width * (health / maxHealth);
+
+        });
+    }
+
 
     createWave()
     {
@@ -145,6 +166,7 @@ export class Game extends Scene
         this.createPath();
         this.createDefenderPath();
         this.createWashington();
+        this.createHealthBar(520, 10, 500, 10, this.health, 100);
         this.wave = 1;
 
         this.remainingEnemies = 5 * Math.floor(Math.pow(this.wave, 1.1));
@@ -177,6 +199,7 @@ export class Game extends Scene
                 }
             }
         }
+
     }
     //*/
 }

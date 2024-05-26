@@ -25,7 +25,9 @@ export class GameOver extends Scene
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5).setDepth(100);
-        
+
+        this.add.text(512, 384 + 64, 'Click to return to the main menu')
+
         EventBus.emit('current-scene-ready', this);
     }
 

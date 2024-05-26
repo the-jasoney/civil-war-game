@@ -1,25 +1,42 @@
 div#app {
-    font-family: 'Inter', Arial;
+    font-family: 'Inter' !important;
+    width: 100%;
+    height: 100%;
+    display: flex;
 }
 
-button {
+body {
+    background-color: grey;
+}
+
+button.menu-button {
+    font-family: 'Inter' !important;
     border-radius: 5px;
     background-color: #4CAF50;
     color: white;
     padding: 14px 20px;
     margin: 8px 0;
-    margin-left: 10px;
     border: none;
     cursor: pointer;
     width: 100%;
+    font-size: 18px;
 }
 
+button:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+
+}
 div#menu {
     float: right;
     height: 100%;
+    margin-left: 10px;
 }
 
 div#game-container {
     float: left;
-    margin-left: 0;
+    margin: 0;
+    width: 1024px;
+    height: 768px;
 }

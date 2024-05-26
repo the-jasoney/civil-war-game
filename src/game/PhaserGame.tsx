@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
 import StartGame from './main';
 import { EventBus } from './EventBus';
+import { Question } from '../components/Question';
 
 export interface IRefPhaserGame
 {
@@ -8,73 +9,84 @@ export interface IRefPhaserGame
     scene: Phaser.Scene | null;
 }
 
-interface IProps
-{
-    currentActiveScene?: (scene_instance: Phaser.Scene) => void
+
+export enum Active {
+    Game,
+    Question,
 }
 
-export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene }, ref)
+interface IProps
 {
-    const game = useRef<Phaser.Game | null>(null!);
+    currentActiveScene?: (scene_instance: Phaser.Scene) => void,
+    currentActive: Active
+}
 
-    useLayoutEffect(() =>
+export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(
+    function PhaserGame({ currentActiveScene, currentActive }, ref)
     {
-        if (game.current === null)
+        const game = useRef<Phaser.Game | null>(null!);
+
+        useLayoutEffect(() =>
         {
-
-            game.current = StartGame("game-container");
-
-            if (typeof ref === 'function')
+            if (game.current === null)
             {
-                ref({ game: game.current, scene: null });
-            } else if (ref)
-            {
-                ref.current = { game: game.current, scene: null };
+
+                game.current = StartGame(document.getElementById('game-canvas') as HTMLCanvasElement);
+
+                if (typeof ref === 'function')
+                {
+                    ref({ game: game.current, scene: null });
+                } else if (ref)
+                {
+                    ref.current = { game: game.current, scene: null };
+                }
+
             }
 
-        }
-
-        return () =>
-        {
-            if (game.current)
+            return () =>
             {
-                game.current.destroy(true);
-                if (game.current !== null)
+                if (game.current)
                 {
-                    game.current = null;
+                    game.current.destroy(true);
+                    if (game.current !== null)
+                    {
+                        game.current = null;
+                    }
                 }
             }
-        }
-    }, [ref]);
+        }, [ref]);
 
-    useEffect(() =>
-    {
-        EventBus.on('current-scene-ready', (scene_instance: Phaser.Scene) =>
+        useEffect(() =>
         {
-            if (currentActiveScene && typeof currentActiveScene === 'function')
+            EventBus.on('current-scene-ready', (scene_instance: Phaser.Scene) =>
             {
+                if (currentActiveScene && typeof currentActiveScene === 'function')
+                {
 
-                currentActiveScene(scene_instance);
+                    currentActiveScene(scene_instance);
 
+                }
+
+                if (typeof ref === 'function')
+                {
+                    ref({ game: game.current, scene: scene_instance });
+                } else if (ref)
+                {
+                    ref.current = { game: game.current, scene: scene_instance };
+                }
+
+            });
+            return () =>
+            {
+                EventBus.removeListener('current-scene-ready');
             }
+        }, [currentActiveScene, ref]);
 
-            if (typeof ref === 'function')
-            {
-                ref({ game: game.current, scene: scene_instance });
-            } else if (ref)
-            {
-                ref.current = { game: game.current, scene: scene_instance };
-            }
-            
-        });
-        return () =>
-        {
-            EventBus.removeListener('current-scene-ready');
-        }
-    }, [currentActiveScene, ref]);
-
-    return (
-        <div id="game-container"></div>
-    );
-
-});
+        return (
+            <div id="game-container">
+                <canvas id="game-canvas" hidden={currentActive != Active.Game}></canvas>
+                <Question hidden={currentActive != Active.Question} />
+            </div>
+        );
+    }
+);
