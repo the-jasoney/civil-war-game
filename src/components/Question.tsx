@@ -16,7 +16,7 @@ export function Question({ hidden }: QuestionProps) {
     const [questionData, setQuestionData] = useState<QuestionData[] | null>(
         null
     );
-
+    const [questionIndex, setQuestionIndex] = useState<number>(48);
     const [question, setQuestion] = useState<string | null>(null);
     const [options, setOptions] = useState<[number, string][] | null>(null);
     const [reference, setReference] = useState<string | null>(null);
@@ -30,26 +30,40 @@ export function Question({ hidden }: QuestionProps) {
             .then((response) => response.text())
             .then((data) =>
                 setQuestionData(
-                    data.split("\n").filter(v => v.length > 1).map((line: string) => {
-                        const lineData = line.split(",");
-                        return {
-                            question: lineData[0],
-                            options: lineData.slice(1, 5),
-                            reference: lineData[5],
-                        };
-                    })
+                    _.shuffle(
+                        data
+                            .split("\n")
+                            .filter((v) => v.length > 1)
+                            .map((line: string) => {
+                                const lineData = line.split(",");
+                                return {
+                                    question: lineData[0],
+                                    options: lineData.slice(1, 5),
+                                    reference: lineData[5],
+                                };
+                            })
+                    )
                 )
             );
     }, []);
 
     useEffect(() => {
         if (questionData) {
-            let index = Math.floor(Math.random() * questionData.length);
-            let options = _.shuffle([...questionData[index].options.entries()]);
+            let options = _.shuffle([...questionData[questionIndex].options.entries()]);
 
-            setQuestion(questionData[index].question);
+            setQuestion(questionData[questionIndex].question);
             setOptions(options);
-            setReference(questionData[index].reference);
+            setReference(questionData[questionIndex].reference);
+
+            setQuestionIndex(questionIndex + 1);
+
+            if (questionIndex >= 49)
+            {
+                setQuestionIndex(0);
+                setQuestionData(_.shuffle(questionData));
+            }
+
+            console.log(questionIndex);
         }
     }, [questionData, questionNumber]);
 
@@ -84,12 +98,15 @@ export function Question({ hidden }: QuestionProps) {
             <h2>
                 {correct != null ? (correct ? "Correct!" : "Incorrect!") : ""}
                 <button
-                onClick={() => {
-                    setQuestionNumber(questionNumber + 1);
-                    setAnswered(false);
-                    setCorrect(null);
-                }}
-            >Next</button>
+                    onClick={() => {
+                        setQuestionNumber(questionNumber + 1);
+                        setAnswered(false);
+                        setCorrect(null);
+                    }}
+                    disabled={!answered}
+                >
+                    Next
+                </button>
             </h2>
         </div>
     );
