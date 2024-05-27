@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import _ from "lodash";
 import "./Question.scss";
 
 interface QuestionProps {
     hidden: boolean;
+    setQuestionsCorrect: React.Dispatch<React.SetStateAction<number>>;
 }
 
 interface QuestionData {
@@ -12,7 +13,7 @@ interface QuestionData {
     reference: string;
 }
 
-export function Question({ hidden }: QuestionProps) {
+export function Question({ hidden, setQuestionsCorrect }: QuestionProps) {
     const [questionData, setQuestionData] = useState<QuestionData[] | null>(
         null
     );
@@ -49,7 +50,9 @@ export function Question({ hidden }: QuestionProps) {
 
     useEffect(() => {
         if (questionData) {
-            let options = _.shuffle([...questionData[questionIndex].options.entries()]);
+            let options = _.shuffle([
+                ...questionData[questionIndex].options.entries(),
+            ]);
 
             setQuestion(questionData[questionIndex].question);
             setOptions(options);
@@ -57,8 +60,7 @@ export function Question({ hidden }: QuestionProps) {
 
             setQuestionIndex(questionIndex + 1);
 
-            if (questionIndex >= 49)
-            {
+            if (questionIndex >= 49) {
                 setQuestionIndex(0);
                 setQuestionData(_.shuffle(questionData));
             }
@@ -71,6 +73,9 @@ export function Question({ hidden }: QuestionProps) {
         setAnswered(true);
         setSelected(option);
         let correct = options?.filter((v) => v[0] == 0);
+        if (correct![0][0] == option) {
+            setQuestionsCorrect((prev) => prev + 1);
+        }
         setCorrect(correct![0][0] == option);
         console.log(correct);
     };

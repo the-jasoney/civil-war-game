@@ -1,11 +1,10 @@
-import { EventBus } from '../EventBus';
-import { Scene } from 'phaser';
-import { Confederate } from '../objects/Confederate';
-import { Union } from '../objects/Union';
-import { Geom } from 'phaser';
+import { EventBus } from "../EventBus";
+import { Scene } from "phaser";
+import { Confederate } from "../objects/Confederate";
+import { Union } from "../objects/Union";
+import { Geom } from "phaser";
 
-export class Game extends Scene
-{
+export class Game extends Scene {
     background: Phaser.GameObjects.Image;
 
     graphics: Phaser.GameObjects.Graphics;
@@ -45,19 +44,23 @@ export class Game extends Scene
 
     healthBar: Phaser.GameObjects.Rectangle;
 
-    constructor ()
-    {
-        super('Game');
+    constructor() {
+        super("Game");
     }
 
-    createBackground ()
-    {
-        this.background = this.add.sprite(this.sys.canvas.width / 2, this.sys.canvas.height / 2, 'map');
-        this.background.setDisplaySize(this.sys.canvas.width, this.sys.canvas.height);
+    createBackground() {
+        this.background = this.add.sprite(
+            this.sys.canvas.width / 2,
+            this.sys.canvas.height / 2,
+            "map"
+        );
+        this.background.setDisplaySize(
+            this.sys.canvas.width,
+            this.sys.canvas.height
+        );
     }
 
-    createPath ()
-    {
+    createPath() {
         this.graphics = this.add.graphics();
         this.path = this.add.path(96, -32);
         this.path.lineTo(96, 100);
@@ -71,8 +74,7 @@ export class Game extends Scene
         this.path.draw(this.graphics);
     }
 
-    createDefenderPath ()
-    {
+    createDefenderPath() {
         this.defenderPath = this.add.path(450, 450);
         this.defenderPath.lineTo(96, 450);
         this.defenderPath.lineTo(96, 668);
@@ -82,63 +84,105 @@ export class Game extends Scene
         this.defenderPath.lineTo(96, -32);
     }
 
-    createWashington ()
-    {
+    createWashington() {
         this.washingtonCircle = this.add.circle(450, 450, 10, 0x00ff00);
-        this.washingtonText = this.add.text(460, 450, 'Washington', { font: '16px Arial Black', color: "#000000" });
+        this.washingtonText = this.add.text(460, 450, "Washington", {
+            font: "1000 18px Inter",
+            color: "#000000",
+            fontStyle: "strong",
+        });
     }
 
-    onEnemyReachWashington (i: Confederate) {
+    onEnemyReachWashington(i: Confederate) {
         return () => {
             console.log(`Enemy reached Washington`, this.enemies);
             this.enemiesLeft--;
             this.enemies.remove(i, true, true);
             this.cameras.main.shake(100, 0.005);
             this.health -= 2 * this.wave;
-            EventBus.emit('health-change', this.health);
+            EventBus.emit("health-change", this.health);
             if (this.enemiesLeft == 0) {
-                console.log('Wave complete');
-                EventBus.emit('wave-complete');
+                console.log("Wave complete");
+                EventBus.emit("wave-complete");
             }
-        }
+        };
     }
 
-    createHealthBar (x: number, y: number, width: number, height: number, health: number, maxHealth: number) {
-        this.add.rectangle(x, y, width, height, 0x000000).strokeColor = 0xffffff;
-        this.healthBar = this.add.rectangle(x, y, width * (health / maxHealth) - 2, height - 2, 0xff0000);
+    createHealthBar(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        health: number,
+        maxHealth: number
+    ) {
+        this.add.rectangle(
+            x,
+            y,
+            width,
+            height,
+            0x000000
+        ).strokeColor = 0xffffff;
+        this.healthBar = this.add.rectangle(
+            x,
+            y,
+            width * (health / maxHealth) - 2,
+            height - 2,
+            0xff0000
+        );
 
-        EventBus.on('health-change', (health: number) => {
+        EventBus.on("health-change", (health: number) => {
             if (health <= 0) {
-                this.scene.start('GameOver');
+                this.scene.start("GameOver");
             }
             this.health = health;
             this.healthBar.width = width * (health / maxHealth);
-
         });
     }
 
+    makeWave(defenders: number) {
+        const rectangle = this.add
+            .rectangle(0, 0, 1024, 768, 0x999999, 0.8)
+            .setOrigin(0, 0);
+        const text = this.add.text(20, 300, "Confederates are attacking!", {
+            font: "800 70px Inter",
+            color: "#000000",
+        });
+        setTimeout(() => {
+            rectangle.destroy();
+            text.destroy();
 
-    createWave()
-    {
+            this.createWave(defenders);
+        }, 3000);
+    }
+
+    createWave(defenders: number) {
         this.remainingEnemies = 5 * Math.floor(Math.pow(this.wave, 1.1));
-        this.speed = 1.1 + ((this.wave - 1) * 0.1);
+        this.speed = 1.1 + (this.wave - 1) * 0.1;
+        this.remainingDefenders = defenders;
 
-        this.remainingDefenders = 5;
         console.log(`${this.remainingEnemies} ${this.wave}`);
 
         const onDefendersReachEndOfPath = () => {
             console.log(`Defender reached end of path`, this.defenders);
             this.defendersLeft--;
-        }
+        };
 
         const int = setInterval(() => {
-            if(this.remainingEnemies == 0 && this.remainingDefenders == 0) {
+            if (this.remainingEnemies == 0 && this.remainingDefenders == 0) {
                 clearInterval(int);
             }
 
             if (this.remainingEnemies > 0) {
-                console.log('Creating enemy')
-                const co = new Confederate(this, this.path, 96, -32, this.speed, this.wave * 100, () => {})
+                console.log("Creating enemy");
+                const co = new Confederate(
+                    this,
+                    this.path,
+                    96,
+                    -32,
+                    this.speed,
+                    () => {}
+                );
                 co.onComplete = this.onEnemyReachWashington(co);
                 this.enemies.add(co);
                 this.remainingEnemies--;
@@ -146,21 +190,42 @@ export class Game extends Scene
             }
 
             if (this.remainingDefenders > 0) {
-                console.log('Creating defender')
-                // TODO: strength
-                this.defenders.add(new Union(this, this.defenderPath, 450, 450, this.speed, this.wave * 100, onDefendersReachEndOfPath));
+                console.log("Creating defender");
+                this.defenders.add(
+                    new Union(
+                        this,
+                        this.defenderPath,
+                        450,
+                        450,
+                        this.speed,
+                        onDefendersReachEndOfPath
+                    )
+                );
                 this.remainingDefenders--;
                 this.defendersLeft++;
             }
         }, 250 / this.speed);
 
-
         this.wave++;
     }
 
+    waveComplete() {
+        setTimeout(() => {
+            const rectangle = this.add
+                .rectangle(0, 0, 1024, 768, 0x999999, 0.8)
+                .setOrigin(0, 0);
+            const text = this.add.text(20, 300, "Confederates defeated!", {
+                font: "800 70px Inter",
+                color: "#000000",
+            });
+            setTimeout(() => {
+                rectangle.destroy();
+                text.destroy();
+            }, 3000);
+        }, 1000);
+    }
 
-    create ()
-    {
+    create() {
         this.scale.setGameSize(1024, 768);
         this.createBackground();
         this.createPath();
@@ -170,36 +235,40 @@ export class Game extends Scene
         this.wave = 1;
 
         this.remainingEnemies = 5 * Math.floor(Math.pow(this.wave, 1.1));
-        this.speed = 1 + ((this.wave - 1) * 0.1);
+        this.speed = 1 + (this.wave - 1) * 0.1;
         this.enemies = this.add.group();
         this.defenders = this.add.group();
 
-        EventBus.emit('main-scene-ready', this);
+        EventBus.emit("main-scene-ready", this);
 
-        EventBus.on('next-wave', () => this.createWave());
+        EventBus.on("next-wave", (questionsCorrect: number) => {
+            this.makeWave(questionsCorrect + 5);
+        });
     }
 
-    ///*
-    update ()
-    {
+    update() {
         enemyLoop: for (const i of this.enemies.getChildren()) {
             for (const j of this.defenders.getChildren()) {
-                if (Geom.Intersects.RectangleToRectangle((i as Confederate).getBounds(), (j as Union).getBounds())) {
+                if (
+                    Geom.Intersects.RectangleToRectangle(
+                        (i as Confederate).getBounds(),
+                        (j as Union).getBounds()
+                    )
+                ) {
                     (i as Confederate).stopFollow();
                     (j as Union).stopFollow();
-                    this.enemies.remove(<Confederate> i, true, true);
-                    this.defenders.remove(<Union> j, true, true);
+                    this.enemies.remove(<Confederate>i, true, true);
+                    this.defenders.remove(<Union>j, true, true);
 
                     this.enemiesLeft--;
 
                     if (this.enemiesLeft == 0) {
-                        EventBus.emit('wave-complete');
+                        this.waveComplete();
+                        EventBus.emit("wave-complete");
                     }
                     continue enemyLoop;
                 }
             }
         }
-
     }
-    //*/
 }
