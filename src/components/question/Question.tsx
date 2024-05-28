@@ -17,7 +17,7 @@ export function Question({ hidden, setQuestionsCorrect }: QuestionProps) {
     const [questionData, setQuestionData] = useState<QuestionData[] | null>(
         null
     );
-    const [questionIndex, setQuestionIndex] = useState<number>(48);
+    const [questionIndex, setQuestionIndex] = useState<number>(0);
     const [question, setQuestion] = useState<string | null>(null);
     const [options, setOptions] = useState<[number, string][] | null>(null);
     const [reference, setReference] = useState<string | null>(null);
@@ -64,8 +64,6 @@ export function Question({ hidden, setQuestionsCorrect }: QuestionProps) {
                 setQuestionIndex(0);
                 setQuestionData(_.shuffle(questionData));
             }
-
-            console.log(questionIndex);
         }
     }, [questionData, questionNumber]);
 
@@ -77,7 +75,6 @@ export function Question({ hidden, setQuestionsCorrect }: QuestionProps) {
             setQuestionsCorrect((prev) => prev + 1);
         }
         setCorrect(correct![0][0] == option);
-        console.log(correct);
     };
 
     return (
@@ -108,6 +105,7 @@ export function Question({ hidden, setQuestionsCorrect }: QuestionProps) {
                         setAnswered(false);
                         setCorrect(null);
                     }}
+                    className="next"
                     disabled={!answered}
                 >
                     Next

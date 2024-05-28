@@ -27,7 +27,7 @@ button.menu-button {
 
 button:disabled {
     background-color: #cccccc;
-    color: #666666;
+    color: grey;
     cursor: not-allowed;
 }
 div#menu {
@@ -41,4 +41,25 @@ div#game-container {
     margin: 0;
     width: 1024px;
     height: 768px;
+}
+
+.item {
+    width: 100%;
+    font-size: larger;
+    display: flex;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 10px 30px;
+    margin: 10px 0;
+
+    .left {
+        flex: 0;
+    }
+    .center {
+        flex-grow: 1;
+        padding-left: 10px;
+    }
+    .right {
+        flex: 0;
+    }
 }

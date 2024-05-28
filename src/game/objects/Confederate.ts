@@ -32,6 +32,11 @@ export class Confederate extends Phaser.GameObjects.PathFollower {
         });
     }
 
+    destroy() {
+        console.log("confederate destroyed")
+        super.destroy()
+    }
+
     onComplete() {
         this.onCompleteCallback();
     }

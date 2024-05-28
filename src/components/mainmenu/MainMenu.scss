@@ -1,0 +1,42 @@
+h1 {
+    text-align: center;
+
+}
+
+div.text {
+    background-color: white;
+    border-radius: 5px;
+    padding: 0.5em;
+    margin: 1em;
+}
+
+div.main-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+button.start {
+    vertical-align: top;
+    font-family: "Inter" !important;
+    border-radius: 5px;
+    background-color: #4caf50;
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    font-size: 16px;
+    margin-right: 25px;
+    margin-left: auto;
+    margin-right: auto;
+
+    cursor: pointer;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px;
+}

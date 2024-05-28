@@ -32,6 +32,9 @@ export class Preloader extends Scene {
         this.load.image("confederate", "confederate.png");
         this.load.image("union", "union.png");
 
+        this.load.audio('yeehaw', 'scottstoked_yeehaw.wav');
+
+
         this.load.plugin(
             "rexbuttonplugin",
             "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbuttonplugin.min.js",

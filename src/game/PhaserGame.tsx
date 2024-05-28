@@ -1,7 +1,8 @@
 import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
 import StartGame from "./main";
 import { EventBus } from "./EventBus";
-import { Question } from "../components/Question";
+import { Question } from "../components/question/Question";
+import { MainMenu } from "../components/mainmenu/MainMenu";
 
 export interface IRefPhaserGame {
     game: Phaser.Game | null;
@@ -11,17 +12,19 @@ export interface IRefPhaserGame {
 export enum Active {
     Game,
     Question,
+    MainMenu,
 }
 
 interface IProps {
     currentActiveScene?: (scene_instance: Phaser.Scene) => void;
     currentActive: Active;
     setQuestionsCorrect: React.Dispatch<React.SetStateAction<number>>;
+    startGame: () => void;
 }
 
 export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(
     function PhaserGame(
-        { currentActiveScene, currentActive, setQuestionsCorrect },
+        { currentActiveScene, currentActive, setQuestionsCorrect, startGame },
         ref
     ) {
         const game = useRef<Phaser.Game | null>(null!);
@@ -77,14 +80,19 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(
 
         return (
             <div id="game-container">
-                <canvas
-                    id="game-canvas"
-                    hidden={currentActive != Active.Game}
-                ></canvas>
-                <Question
-                    hidden={currentActive != Active.Question}
-                    setQuestionsCorrect={setQuestionsCorrect}
-                />
+                <canvas id="game-canvas" hidden={currentActive != Active.Game}></canvas>
+                {currentActive == Active.Question && (
+                    <Question
+                        hidden={currentActive != Active.Question}
+                        setQuestionsCorrect={setQuestionsCorrect}
+                    />
+                )}
+                {currentActive == Active.MainMenu && (
+                    <MainMenu
+                        startGame={startGame}
+                        hidden={currentActive != Active.MainMenu}
+                    />
+                )}
             </div>
         );
     }

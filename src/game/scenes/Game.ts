@@ -22,23 +22,11 @@ export class Game extends Scene {
     // Array of all enemies
     enemies: Phaser.GameObjects.Group;
 
-    // Number of enemies left to spawn (5 * wave^1.1)
-    remainingEnemies: number = 0;
-
-    // Not to be confused with remainingEnemies, this is the number of enemies left on the map
-    enemiesLeft: number = 0;
-
     // Array of all defenders
     defenders: Phaser.GameObjects.Group;
 
     // path that defenders follow (not displayed)
     defenderPath: Phaser.Curves.Path;
-
-    // Number of defenders left to spawn
-    remainingDefenders: number = 0;
-
-    // Number of defenders left on the map
-    defendersLeft: number = 0;
 
     health: number = 100;
 
@@ -95,14 +83,13 @@ export class Game extends Scene {
 
     onEnemyReachWashington(i: Confederate) {
         return () => {
-            console.log(`Enemy reached Washington`, this.enemies);
-            this.enemiesLeft--;
+            console.log("Enemy reached Washington");
             this.enemies.remove(i, true, true);
             this.cameras.main.shake(100, 0.005);
             this.health -= 2 * this.wave;
             EventBus.emit("health-change", this.health);
-            if (this.enemiesLeft == 0) {
-                console.log("Wave complete");
+            if (this.enemies.getLength() == 0) {
+                console.log('onEnemyReachWashington wc')
                 EventBus.emit("wave-complete");
             }
         };
@@ -157,24 +144,17 @@ export class Game extends Scene {
     }
 
     createWave(defenders: number) {
-        this.remainingEnemies = 5 * Math.floor(Math.pow(this.wave, 1.1));
         this.speed = 1.1 + (this.wave - 1) * 0.1;
-        this.remainingDefenders = defenders;
 
-        console.log(`${this.remainingEnemies} ${this.wave}`);
-
-        const onDefendersReachEndOfPath = () => {
-            console.log(`Defender reached end of path`, this.defenders);
-            this.defendersLeft--;
-        };
+        let remainingEnemies = 5 * Math.floor(Math.pow(this.wave, 1.1));
+        let remainingDefenders = defenders;
 
         const int = setInterval(() => {
-            if (this.remainingEnemies == 0 && this.remainingDefenders == 0) {
+            if (remainingEnemies == 0 && remainingDefenders == 0) {
                 clearInterval(int);
             }
 
-            if (this.remainingEnemies > 0) {
-                console.log("Creating enemy");
+            if (remainingEnemies > 0) {
                 const co = new Confederate(
                     this,
                     this.path,
@@ -185,12 +165,10 @@ export class Game extends Scene {
                 );
                 co.onComplete = this.onEnemyReachWashington(co);
                 this.enemies.add(co);
-                this.remainingEnemies--;
-                this.enemiesLeft++;
+                remainingEnemies--;
             }
 
-            if (this.remainingDefenders > 0) {
-                console.log("Creating defender");
+            if (remainingDefenders > 0) {
                 this.defenders.add(
                     new Union(
                         this,
@@ -198,11 +176,10 @@ export class Game extends Scene {
                         450,
                         450,
                         this.speed,
-                        onDefendersReachEndOfPath
+                        () => {}
                     )
                 );
-                this.remainingDefenders--;
-                this.defendersLeft++;
+                remainingDefenders--;
             }
         }, 250 / this.speed);
 
@@ -210,6 +187,12 @@ export class Game extends Scene {
     }
 
     waveComplete() {
+        this.enemies.destroy();
+        this.defenders.destroy();
+
+        this.enemies = this.add.group();
+        this.defenders = this.add.group();
+
         setTimeout(() => {
             const rectangle = this.add
                 .rectangle(0, 0, 1024, 768, 0x999999, 0.8)
@@ -221,6 +204,8 @@ export class Game extends Scene {
             setTimeout(() => {
                 rectangle.destroy();
                 text.destroy();
+
+                EventBus.emit("wave-complete", this.defenders.getLength());
             }, 3000);
         }, 1000);
     }
@@ -234,7 +219,6 @@ export class Game extends Scene {
         this.createHealthBar(520, 10, 500, 10, this.health, 100);
         this.wave = 1;
 
-        this.remainingEnemies = 5 * Math.floor(Math.pow(this.wave, 1.1));
         this.speed = 1 + (this.wave - 1) * 0.1;
         this.enemies = this.add.group();
         this.defenders = this.add.group();
@@ -257,14 +241,12 @@ export class Game extends Scene {
                 ) {
                     (i as Confederate).stopFollow();
                     (j as Union).stopFollow();
-                    this.enemies.remove(<Confederate>i, true, true);
-                    this.defenders.remove(<Union>j, true, true);
+                    this.enemies.remove(i, true, true);
+                    this.defenders.remove(j, true, true);
 
-                    this.enemiesLeft--;
-
-                    if (this.enemiesLeft == 0) {
+                    if (this.enemies.getLength() == 0) {
+                        console.log('update wc')
                         this.waveComplete();
-                        EventBus.emit("wave-complete");
                     }
                     continue enemyLoop;
                 }
