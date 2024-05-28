@@ -12,7 +12,10 @@ export function MainMenu({ hidden, startGame }: MainMenuProps) {
             <div className="text">
                 <h1>Rules</h1>
                 <p>
-                    You are given 30 seconds to answer as much questions as possible. For every question, you get troops, shown on the right after the Union flag.
+                    <em>Note: This game works best when run in fullscreen mode (</em> <kbd>F11</kbd> <em>or</em> <kbd>Fn</kbd>+<kbd>F11</kbd> <em>) on most browsers and keyboards</em>
+                    <br />
+                    <br />
+                    You are given 30 seconds (shown after timer icon or in the top progress bar) to answer as much questions as possible. For every question, you get troops, shown on the right after the Union flag.
                     <br />
                     <br />
                     Every 30 seconds, the confederates will attack, with increasing numbers every wave (confederate numbers shown after confederate flag on the right, and waves shown after the trophy).

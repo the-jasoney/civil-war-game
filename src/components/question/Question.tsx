@@ -68,6 +68,8 @@ export function Question({ hidden, setQuestionsCorrect }: QuestionProps) {
     }, [questionData, questionNumber]);
 
     let onClick = (option: number) => () => {
+        if (answered) return;
+
         setAnswered(true);
         setSelected(option);
         let correct = options?.filter((v) => v[0] == 0);

@@ -29,7 +29,7 @@ function App() {
     const [gameIsStarted, setGameIsStarted] = useState(false);
 
     const nextWave = () => {
-        EventBus.emit("next-wave", 2*questionsCorrect);
+        EventBus.emit("next-wave", 2 * questionsCorrect);
         setTimerActive(false);
         setTimeLeft(100);
         setCurrentActive(Active.Game);
@@ -122,7 +122,7 @@ function App() {
                         </div>
                         <div className="center">|</div>
                         <div className="right">
-                            {25000 + (2 * questionsCorrect) * 5000}
+                            {25000 + 2 * questionsCorrect * 5000}
                         </div>
                     </div>
                     <p>v0.1 by Jason Wen, 2024</p>
